@@ -17,7 +17,8 @@
 
 (defn dummy-handler
   [request]
-  (println "Dummy request" request))
+  (println "Dummy request" request)
+  "Dummy Handler did it's job")
 
 (defn sse-handler-using-heroku
   "Stream SSE data from the Kafka topic"
