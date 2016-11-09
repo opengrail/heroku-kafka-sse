@@ -38,6 +38,7 @@
       (route/not-found "No such page."))))
 
 (defn -main [& [port]]
+  (println "Starting with web port" port)
   (let [port (Integer. (or port (env :port) 5000))]
     (http/start-server handler {:port port})))
 
