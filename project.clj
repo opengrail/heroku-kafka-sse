@@ -17,4 +17,5 @@
   :plugins [[environ/environ.lein "0.3.1"]]
   :hooks [environ.leiningen.hooks]
   :uberjar-name "clojure-getting-started-standalone.jar"
-  :profiles {:production {:env {:production true}}})
+  :profiles {:production {:env {:production true}}}
+  :pedantic? :warn)
