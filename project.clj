@@ -4,9 +4,9 @@
   :license {:name "Eclipse Public License v1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [compojure "1.5.1" :exclusions [org.clojure/tools.reader]]
+                 [compojure "1.5.1"]
                  [aleph "0.4.1"]
-                 [ring/ring-jetty-adapter "1.4.0"]
+                 ;                 [ring/ring-jetty-adapter "1.4.0"]
                  [environ "1.1.0"]
                  [com.github.jkutner/env-keystore "0.1.2"]
                  [com.opengrail/kafka-sse-clj "0.1.0"]
