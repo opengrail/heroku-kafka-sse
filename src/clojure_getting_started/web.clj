@@ -18,6 +18,7 @@
 (defn sse-handler-using-heroku
   "Stream SSE data from the Kafka topic"
   [request]
+  (println "Starting to run a request" request)
   (let [topic-name (get (:params request) "topic" TOPIC)
         offset (get (:headers request) "last-event-id" CONSUME_LATEST)
         event-filter-regex (get (:params request) "filter[event]" ".*")
