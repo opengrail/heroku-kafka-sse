@@ -30,13 +30,12 @@
                "Cache-Control" "no-cache"}
      :body    (s/->source ch)}))
 
-
 (def handler
   (params/wrap-params
     (compojure/routes
+      (GET "/" [] "Hello")
       (GET "/kafka-sse" [] sse-handler-using-heroku)
       (route/not-found "No such page."))))
-
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))]
