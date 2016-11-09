@@ -11,8 +11,8 @@
                  [com.github.jkutner/env-keystore "0.1.2"]
                  [com.opengrail/kafka-sse-clj "0.1.0"]
                  ; only for the demo ... these libs are needed to run the Kafka Producer
-                 [org.apache.kafka/kafka_2.10 "0.10.0.1" :exclusions [org.slf4j/slf4j-log4j12 org.slf4j/slf4j-api org.scala-lang/scala-library]]
-                 [org.apache.kafka/kafka-clients "0.10.0.1" :exclusions [org.slf4j/slf4j-log4j12 org.slf4j/slf4j-api]]]
+                 [org.apache.kafka/kafka_2.10 "0.10.0.1"]
+                 [org.apache.kafka/kafka-clients "0.10.0.1"]]
   :min-lein-version "2.0.0"
   :plugins [[environ/environ.lein "0.3.1"]]
   :hooks [environ.leiningen.hooks]
