@@ -1,25 +1,46 @@
 (ns clojure-getting-started.web
-  (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
-            [compojure.handler :refer [site]]
+  (:require [aleph.http :as http]
             [compojure.route :as route]
-            [clojure.java.io :as io]
-            [ring.adapter.jetty :as jetty]
-            [environ.core :refer [env]]))
+            [compojure.core :as compojure :refer [GET]]
+            [ring.middleware.params :as params]
+            [manifold.stream :as s]
+            [environ.core :refer [env]]
+            [clojure-getting-started.producer :as producer]
+            [clojure-getting-started.heroku-kafka :as heroku]))
 
-(defn splash []
-  {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello from Heroku"})
+(defn env-or-default [env-var-name default]
+  (if-let [env-var (env env-var-name)] env-var default))
 
-(defroutes app
-  (GET "/" []
-       (splash))
-  (ANY "*" []
-       (route/not-found (slurp (io/resource "404.html")))))
+(def ^:private CONSUME_LATEST -1)
+
+(def ^:private TOPIC (env-or-default :sse-proxy-topic "simple-proxy-topic"))
+
+(defn sse-handler-using-heroku
+  "Stream SSE data from the Kafka topic"
+  [request]
+  (let [topic-name (get (:params request) "topic" TOPIC)
+        offset (get (:headers request) "last-event-id" CONSUME_LATEST)
+        event-filter-regex (get (:params request) "filter[event]" ".*")
+
+        _ (producer/produce-constantly! topic-name) ; not normal, just for demo - also produce!!
+
+        ch (heroku/heroku-kafka->sse-ch topic-name offset event-filter-regex)]
+    {:status  200
+     :headers {"Content-Type"  "text/event-stream;charset=UTF-8"
+               "Cache-Control" "no-cache"}
+     :body    (s/->source ch)}))
+
+
+(def handler
+  (params/wrap-params
+    (compojure/routes
+      (GET "/kafka-sse" [] sse-handler-using-heroku)
+      (route/not-found "No such page."))))
+
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))]
-    (jetty/run-jetty (site #'app) {:port port :join? false})))
+    (http/start-server handler {:port port})))
 
 ;; For interactive development:
 ;; (.stop server)
