@@ -13,8 +13,7 @@
   [env-var-name]
   (if-let [env-var (env env-var-name)]
     env-var
-    ((println "Cannot find env var" env-var-name)
-      (throw (RuntimeException. (str "Must set environment variable: " env-var-name))))))
+    (throw (RuntimeException. (str "Must set environment variable: " env-var-name)))))
 
 (defn- as-properties
   [m]
@@ -28,11 +27,12 @@
   (if-let [hps-broker-url (env :kafka-plaintext-url)]       ; only possible in Heroku Private Spaces
     (as-properties {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG hps-broker-url})
     ; if not in Heroku Private Space, brokers must always be accessed using SSL
+    (println "Configuring the Kafka Broker connection")
     (let [_ (env-or-fail :kafka-trusted-cert)
           _ (env-or-fail :kafka-client-cert)
           _ (env-or-fail :kafka-client-cert-key)
           broker-url (env-or-fail :kafka-url)
-          brokers (map  #(str (.getHost (URI. %)) ":" (.getPort (URI. %))) (str/split broker-url #","))
+          brokers (map #(str (.getHost (URI. %)) ":" (.getPort (URI. %))) (str/split broker-url #","))
           broker-config {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG (str/join "," brokers)}
           env-trust-store (EnvKeyStore/createWithRandomPassword "KAFKA_TRUSTED_CERT")
           env-key-store (EnvKeyStore/createWithRandomPassword "KAFKA_CLIENT_CERT_KEY" "KAFKA_CLIENT_CERT")
