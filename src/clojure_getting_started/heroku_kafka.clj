@@ -17,6 +17,7 @@
 
 (defn- as-properties
   [m]
+  (println "incoming maps" m)
   (let [props (Properties.)]
     (doseq [[n v] m] (.setProperty props n v))
     props))
@@ -44,7 +45,6 @@
                       SslConfigs/SSL_KEYSTORE_LOCATION_CONFIG   (.getAbsolutePath key-store)
                       SslConfigs/SSL_KEYSTORE_PASSWORD_CONFIG   (.password env-key-store)}
           security-config {CommonClientConfigs/SECURITY_PROTOCOL_CONFIG "SSL"}]
-      (println "Merging config" (merge broker-config ssl-config security-config))
       (as-properties (merge broker-config ssl-config security-config marshalling-config)))))
 
 (defn heroku-kafka->sse-ch

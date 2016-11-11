@@ -13,7 +13,6 @@
 
 (defn produce-constantly!
   [topic-name]
-  (println "produce-constantly! - topic " topic-name)
   (let [heroku-brokers (heroku-kafka/kafka-connection-config marshalling-config)
 
         _PRINTER1 (println "brokers " heroku-brokers)
