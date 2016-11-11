@@ -27,26 +27,25 @@
   (if-let [hps-broker-url (env :kafka-plaintext-url)]       ; only possible in Heroku Private Spaces
     (as-properties {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG hps-broker-url})
     ; if not in Heroku Private Space, brokers must always be accessed using SSL
-    ((println "Configuring the Kafka Broker connection")
-      (let [_ (env-or-fail :kafka-trusted-cert)
-            _ (env-or-fail :kafka-client-cert)
-            _ (env-or-fail :kafka-client-cert-key)
-            broker-url (env-or-fail :kafka-url)
-            brokers (map #(str (.getHost (URI. %)) ":" (.getPort (URI. %))) (str/split broker-url #","))
-            broker-config {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG (str/join "," brokers)}
-            env-trust-store (EnvKeyStore/createWithRandomPassword "KAFKA_TRUSTED_CERT")
-            env-key-store (EnvKeyStore/createWithRandomPassword "KAFKA_CLIENT_CERT_KEY" "KAFKA_CLIENT_CERT")
-            trust-store (.storeTemp env-trust-store)
-            key-store (.storeTemp env-key-store)
-            ssl-config {SslConfigs/SSL_TRUSTSTORE_TYPE_CONFIG     (.type env-trust-store)
-                        SslConfigs/SSL_TRUSTSTORE_LOCATION_CONFIG (.getAbsolutePath trust-store)
-                        SslConfigs/SSL_TRUSTSTORE_PASSWORD_CONFIG (.password env-trust-store)
-                        SslConfigs/SSL_KEYSTORE_TYPE_CONFIG       (.type env-key-store)
-                        SslConfigs/SSL_KEYSTORE_LOCATION_CONFIG   (.getAbsolutePath key-store)
-                        SslConfigs/SSL_KEYSTORE_PASSWORD_CONFIG   (.password env-key-store)}
-            security-config {CommonClientConfigs/SECURITY_PROTOCOL_CONFIG "SSL"}]
-        (println "Merging config" (merge broker-config ssl-config security-config))
-        (as-properties (merge broker-config ssl-config security-config))))))
+    (let [_ (env-or-fail :kafka-trusted-cert)
+          _ (env-or-fail :kafka-client-cert)
+          _ (env-or-fail :kafka-client-cert-key)
+          broker-url (env-or-fail :kafka-url)
+          brokers (map #(str (.getHost (URI. %)) ":" (.getPort (URI. %))) (str/split broker-url #","))
+          broker-config {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG (str/join "," brokers)}
+          env-trust-store (EnvKeyStore/createWithRandomPassword "KAFKA_TRUSTED_CERT")
+          env-key-store (EnvKeyStore/createWithRandomPassword "KAFKA_CLIENT_CERT_KEY" "KAFKA_CLIENT_CERT")
+          trust-store (.storeTemp env-trust-store)
+          key-store (.storeTemp env-key-store)
+          ssl-config {SslConfigs/SSL_TRUSTSTORE_TYPE_CONFIG     (.type env-trust-store)
+                      SslConfigs/SSL_TRUSTSTORE_LOCATION_CONFIG (.getAbsolutePath trust-store)
+                      SslConfigs/SSL_TRUSTSTORE_PASSWORD_CONFIG (.password env-trust-store)
+                      SslConfigs/SSL_KEYSTORE_TYPE_CONFIG       (.type env-key-store)
+                      SslConfigs/SSL_KEYSTORE_LOCATION_CONFIG   (.getAbsolutePath key-store)
+                      SslConfigs/SSL_KEYSTORE_PASSWORD_CONFIG   (.password env-key-store)}
+          security-config {CommonClientConfigs/SECURITY_PROTOCOL_CONFIG "SSL"}]
+      (println "Merging config" (merge broker-config ssl-config security-config))
+      (as-properties (merge broker-config ssl-config security-config)))))
 
 (defn heroku-kafka->sse-ch
   [topic-name offset event-filter]
