@@ -13,9 +13,11 @@
 
 (defn produce-constantly!
   [topic-name]
+  (println "produce-constantly! - topic " topic-name)
   (let [heroku-brokers (heroku-kafka/kafka-connection-config)
         producer (KafkaProducer. (merge heroku-brokers marshalling-config))
         keep-alive-millis 5000]
+    (println "brokers " heroku-brokers)
     (go-loop [rando 0]
       (let [_ (<! (timeout keep-alive-millis))]
         (kafka-produce producer topic-name "rando-event" (str "{\"id\" " rando " \"message\" \"Hello SSE\"}"))
