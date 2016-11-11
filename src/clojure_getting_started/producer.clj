@@ -14,11 +14,11 @@
 (defn produce-constantly!
   [topic-name]
   (println "produce-constantly! - topic " topic-name)
-  (let [heroku-brokers (heroku-kafka/kafka-connection-config)
+  (let [heroku-brokers (heroku-kafka/kafka-connection-config marshalling-config)
 
         _PRINTER1 (println "brokers " heroku-brokers)
 
-        producer (KafkaProducer. (merge heroku-brokers marshalling-config))
+        producer (KafkaProducer. heroku-brokers)
 
         _PRINTER2 (println "producer " producer)
 
