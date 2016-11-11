@@ -17,14 +17,13 @@
 
 (defn- as-properties
   [m]
-  (println "incoming maps" m)
   (let [props (Properties.)]
     (doseq [[n v] m] (.setProperty props n v))
     props))
 
 (defn kafka-connection-config
   "Return a Java Properties object that contains the broker configuration"
-  [& marshalling-config]
+  []
   (if-let [hps-broker-url (env :kafka-plaintext-url)]       ; only possible in Heroku Private Spaces
     (as-properties {CommonClientConfigs/BOOTSTRAP_SERVERS_CONFIG hps-broker-url})
     ; if not in Heroku Private Space, brokers must always be accessed using SSL
@@ -45,7 +44,8 @@
                       SslConfigs/SSL_KEYSTORE_LOCATION_CONFIG   (.getAbsolutePath key-store)
                       SslConfigs/SSL_KEYSTORE_PASSWORD_CONFIG   (.password env-key-store)}
           security-config {CommonClientConfigs/SECURITY_PROTOCOL_CONFIG "SSL"}]
-      (as-properties (merge broker-config ssl-config security-config marshalling-config)))))
+      (println "Merging config" (merge broker-config ssl-config security-config))
+      (as-properties (merge broker-config ssl-config security-config)))))
 
 (defn heroku-kafka->sse-ch
   [topic-name offset event-filter]
