@@ -14,7 +14,6 @@
 (defn produce-constantly!
   [topic-name]
   (println "produce-constantly! - topic " topic-name)
-  (println "produce-constantly! - brokers " (merge heroku-brokers marshalling-config))
   (let [heroku-brokers (heroku-kafka/kafka-connection-config)
         producer (KafkaProducer. (merge heroku-brokers marshalling-config))
         keep-alive-millis 5000]
