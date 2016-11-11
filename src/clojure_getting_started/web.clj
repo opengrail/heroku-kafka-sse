@@ -16,7 +16,7 @@
 
 (def ^:private TOPIC (env-or-default :sse-proxy-topic "simple-proxy-topic"))
 
-(defn handler
+(defn sse
   "Stream SSE data from the Kafka topic"
   [request]
   (println "Starting to run a request" request)
@@ -36,7 +36,7 @@
   (params/wrap-params
     (compojure/routes
       (GET "/" [] "Hello")
-      (GET "/kafka-sse" [] handler)
+      (GET "/kafka-sse" [] sse)
       (route/not-found "No such page."))))
 
 (defn -main [& [port]]
