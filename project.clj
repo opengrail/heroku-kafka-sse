@@ -5,8 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
-                 [aleph "0.4.1"]
-                 ;                 [ring/ring-jetty-adapter "1.4.0"]
+                 [aleph "0.4.2-alpha8"]
+                 [ring/ring-jetty-adapter "1.4.0"]
                  [environ "1.1.0"]
                  [com.github.jkutner/env-keystore "0.1.2"]
                  [com.opengrail/kafka-sse-clj "0.1.0"]

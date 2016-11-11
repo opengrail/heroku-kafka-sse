@@ -1,5 +1,6 @@
 (ns clojure-getting-started.web
   (:require [aleph.http :as http]
+            [aleph.netty :as netty]
             [compojure.route :as route]
             [compojure.core :as compojure :refer [GET]]
             [ring.middleware.params :as params]
@@ -45,9 +46,9 @@
       (route/not-found "No such page."))))
 
 (defn -main [& [port]]
-  (let [port (Integer. (or port (env :port) 5000))]
-    (println "Starting with web port" port)
-    (http/start-server handler {:port port})))
+  (let [port (Integer. (or port (env :port) 5000))
+        server (http/start-server handler {:port port})]
+    (netty/wait-for-close server)))
 
 ;; For interactive development:
 ;; (.stop server)
