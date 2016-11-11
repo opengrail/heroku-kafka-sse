@@ -4,8 +4,8 @@
   (:import (org.apache.kafka.clients.producer ProducerRecord KafkaProducer)
            (org.apache.kafka.common.serialization StringSerializer)))
 
-(def ^:private marshalling-config {"key.serializer"   (str StringSerializer)
-                                   "value.serializer" (str StringSerializer)})
+(def ^:private marshalling-config {"key.serializer"   (.getCanonicalName StringSerializer)
+                                   "value.serializer" (.getCanonicalName StringSerializer)})
 
 (defn kafka-produce
   [producer topic-name k v]
@@ -13,11 +13,9 @@
 
 (defn produce-constantly!
   [topic-name]
-  (println "produce-constantly! - topic " topic-name)
   (let [heroku-brokers (heroku-kafka/kafka-connection-config)
         producer (KafkaProducer. (merge marshalling-config heroku-brokers))
         keep-alive-millis 5000]
-    (println "brokers " heroku-brokers)
     (go-loop [rando 0]
       (let [_ (<! (timeout keep-alive-millis))]
         (kafka-produce producer topic-name "rando-event" (str "{\"id\" " rando " \"message\" \"Hello SSE\"}"))
