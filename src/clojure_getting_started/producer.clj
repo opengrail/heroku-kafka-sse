@@ -15,7 +15,7 @@
   [topic-name]
   (println "produce-constantly! - topic " topic-name)
   (let [heroku-brokers (heroku-kafka/kafka-connection-config)
-        producer (KafkaProducer. (merge heroku-brokers marshalling-config))
+        producer (KafkaProducer. (merge marshalling-config heroku-brokers))
         keep-alive-millis 5000]
     (println "brokers " heroku-brokers)
     (go-loop [rando 0]
