@@ -16,12 +16,7 @@
 
 (def ^:private TOPIC (env-or-default :sse-proxy-topic "simple-proxy-topic"))
 
-(defn dummy-handler
-  [request]
-  (println "Dummy request" request)
-  "Dummy Handler did it's job on" request)
-
-(defn sse-handler-using-heroku
+(defn handler
   "Stream SSE data from the Kafka topic"
   [request]
   (println "Starting to run a request" request)
@@ -41,8 +36,7 @@
   (params/wrap-params
     (compojure/routes
       (GET "/" [] "Hello")
-      (GET "/dummy" [] dummy-handler)
-      (GET "/kafka-sse" [] dummy-handler)
+      (GET "/kafka-sse" [] handler)
       (route/not-found "No such page."))))
 
 (defn -main [& [port]]
