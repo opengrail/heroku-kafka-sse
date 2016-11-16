@@ -30,7 +30,7 @@
 (def handler
   (params/wrap-params
     (compojure/routes
-      (GET "/" [] "Hello")
+      (GET "/" [] "Get your SSE via /kafka-sse")
       (GET "/kafka-sse" [] sse)
       (route/not-found "No such page."))))
 
