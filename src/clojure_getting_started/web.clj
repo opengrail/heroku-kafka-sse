@@ -6,7 +6,6 @@
             [ring.middleware.params :as params]
             [manifold.stream :as s]
             [environ.core :refer [env]]
-            [clojure-getting-started.producer :as producer]
             [clojure-getting-started.heroku-kafka :as heroku]))
 
 (defn env-or-default [env-var-name default]
@@ -22,9 +21,6 @@
   (let [topic-name (get (:params request) "topic" TOPIC)
         offset (get (:headers request) "last-event-id" CONSUME_LATEST)
         event-filter-regex (get (:params request) "filter[event]" ".*")
-
-        _ (producer/produce-constantly! topic-name) ; not normal, just for demo - also produce!!
-
         ch (heroku/heroku-kafka->sse-ch topic-name offset event-filter-regex)]
     {:status  200
      :headers {"Content-Type"  "text/event-stream;charset=UTF-8"

@@ -21,7 +21,7 @@
     (doseq [[n v] m] (.setProperty props n v))
     props))
 
-(defn kafka-connection-config
+(defn- kafka-connection-config
   "Return a Java Properties object that contains the broker configuration"
   []
   (if-let [hps-broker-url (env :kafka-plaintext-url)]       ; only possible in Heroku Private Spaces
@@ -50,8 +50,25 @@
   [topic-name offset event-filter]
   (let [heroku-brokers (kafka-connection-config)
         consumer (sse/sse-consumer topic-name offset heroku-brokers)
-        transducer (comp (filter #(sse/name-matches? event-filter (.key %)))
+        transducer (comp (filter #(sse/name-matches? event-filter (or (.key %) "")))
                          (map sse/consumer-record->sse))]
-    (sse/kafka-consumer->sse-ch consumer transducer true)))
+    (sse/kafka-consumer->sse-ch consumer transducer)))
 
+(defn print-kafka-data
+  [records]
+  (doseq [record records]
+    (println
+      (str "id: " (.offset record) "\n"
+           "event: " (or (.key record) "-") "\n"
+           "data: " (.value record) "\n\n")))
+  true)
+
+(defn heroku-kafka->stdout
+  [topic-name offset]
+  (let [heroku-brokers (kafka-connection-config)
+        consumer (sse/sse-consumer topic-name offset heroku-brokers)
+        stopper (atom true)]
+    (while (= true @stopper)
+      (if-let [records (.poll consumer 100)]
+        (print-kafka-data records)))))
 
