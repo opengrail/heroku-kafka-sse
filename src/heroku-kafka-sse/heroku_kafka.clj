@@ -1,4 +1,4 @@
-(ns clojure-getting-started.heroku-kafka
+(ns heroku-kafka-sse.heroku-kafka
   (:require
     [environ.core :refer [env]]
     [clojure.string :as str]

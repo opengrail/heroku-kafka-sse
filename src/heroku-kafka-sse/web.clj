@@ -1,4 +1,4 @@
-(ns clojure-getting-started.web
+(ns heroku-kafka-sse.web
   (:require [aleph.http :as http]
             [aleph.netty :as netty]
             [compojure.route :as route]
@@ -6,22 +6,22 @@
             [ring.middleware.params :as params]
             [manifold.stream :as s]
             [environ.core :refer [env]]
-            [clojure-getting-started.heroku-kafka :as heroku]))
-
-(defn env-or-default [env-var-name default]
-  (if-let [env-var (env env-var-name)] env-var default))
+            [heroku-kafka-sse.heroku-kafka :as kafka]))
 
 (def ^:private CONSUME_LATEST -1)
 
-(def ^:private TOPIC (env-or-default :sse-proxy-topic "simple-proxy-topic"))
+(def ^:private TOPIC (or (env :sse-proxy-topic) "simple-proxy-topic"))
 
-(defn sse
+
+; TODO add a little style / context and maybe have the stream in a scrolling window
+
+(defn kafka->sse
   "Stream SSE data from the Kafka topic"
   [request]
   (let [topic-name (get (:params request) "topic" TOPIC)
         offset (get (:headers request) "last-event-id" CONSUME_LATEST)
         event-filter-regex (get (:params request) "filter[event]" ".*")
-        ch (heroku/heroku-kafka->sse-ch topic-name offset event-filter-regex)]
+        ch (kafka/heroku-kafka->sse-ch topic-name offset event-filter-regex)]
     {:status  200
      :headers {"Content-Type"  "text/event-stream;charset=UTF-8"
                "Cache-Control" "no-cache"}
@@ -30,15 +30,11 @@
 (def handler
   (params/wrap-params
     (compojure/routes
-      (GET "/" [] "Get your SSE via /kafka-sse")
-      (GET "/kafka-sse" [] sse)
+      (GET "/" [] "Get your SSE via /sse")
+      (GET "/sse" [] kafka->sse)
       (route/not-found "No such page."))))
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))
         server (http/start-server handler {:port port})]
     (netty/wait-for-close server)))
-
-;; For interactive development:
-;; (.stop server)
-;; (def server (-main))
