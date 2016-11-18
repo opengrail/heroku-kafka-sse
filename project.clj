@@ -5,6 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1" :exclusions [org.clojure/tools.reader]]
+                 [hiccup "1.0.5"]
                  [aleph "0.4.2-alpha8"]
                  [com.github.jkutner/env-keystore "0.1.2"]
                  [com.opengrail/kafka-sse-clj "0.1.3"]

@@ -1,5 +1,6 @@
 (ns heroku-kafka-sse.web
   (:require [aleph.http :as http]
+            [hiccup.core :refer :all]
             [aleph.netty :as netty]
             [compojure.route :as route]
             [compojure.core :as compojure :refer [GET]]
@@ -14,6 +15,13 @@
 
 
 ; TODO add a little style / context and maybe have the stream in a scrolling window
+(defn event-source
+  "Send an SSE consumer"
+  [request]
+  ({:status  200
+     :headers {"Content-Type"  "text/html;charset=UTF-8"
+               "Cache-Control" "no-cache"}
+     :body    "Hello SSE"}))
 
 (defn kafka->sse
   "Stream SSE data from the Kafka topic"
@@ -30,7 +38,7 @@
 (def handler
   (params/wrap-params
     (compojure/routes
-      (GET "/" [] "Get your SSE via /sse")
+      (GET "/" [] event-source)
       (GET "/sse" [] kafka->sse)
       (route/not-found "No such page."))))
 
